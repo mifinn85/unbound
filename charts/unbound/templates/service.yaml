@@ -1,6 +1,6 @@
-{{- if or ( .Values.service.tcp.enabled ) ( .Values.service.udp.enabled ) }}
-kind: Service
+{{- if or (.Values.service.tcp.enabled) (.Values.service.udp.enabled) }}
 apiVersion: v1
+kind: Service
 metadata:
   name: {{ template "unbound.fullname" . }}
   labels:
@@ -11,6 +11,7 @@ metadata:
     {{- with .Values.service.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
+  annotations:
     {{- with .Values.service.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -25,18 +26,24 @@ spec:
       {{- toYaml . | nindent 6 }}
     {{- end }}
   ports:
-  {{- if .Values.service.udp.enabled }}
-  - name: dns-udp
-    protocol: UDP
-    port: {{ .Values.containers.unbound.serverPort }}
-    targetPort: dns-udp
-  {{- end }}
-  {{- if and ( eq .Values.containers.unbound.config.doTcp "yes" ) ( .Values.service.tcp.enabled )}}
-  - name: dns-tcp
-    protocol: TCP
-    port: {{ .Values.containers.unbound.serverPort }}
-    targetPort: dns-tcp
-  {{- end }}
+    {{- if .Values.service.udp.enabled }}
+    - name: dns-udp
+      protocol: UDP
+      port: {{ .Values.containers.unbound.serverPort }}
+      targetPort: dns-udp
+    {{- end }}
+    {{- if and (eq .Values.containers.unbound.config.doTcp "yes") (.Values.service.tcp.enabled) }}
+    - name: dns-tcp
+      protocol: TCP
+      port: {{ .Values.containers.unbound.serverPort }}
+      targetPort: dns-tcp
+    {{- end }}
+    {{- if .Values.metrics.enabled }}
+    - name: metrics
+      protocol: TCP
+      port: {{ .Values.metrics.port | default 9167 }}
+      targetPort: metrics
+    {{- end }}
   {{- with .Values.service.sessionAffinity }}
   sessionAffinity: {{ .Values.service.sessionAffinity }}
   {{- end }}
