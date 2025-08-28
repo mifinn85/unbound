@@ -60,7 +60,7 @@ containers:
 
   healthz:
     image:
-      repository: gcr.io/google-containers/exechealthz
+      repository: k8scontainer/exechealthz
       tag: "1.2"
       pullPolicy: IfNotPresent
     resources:
