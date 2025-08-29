@@ -71,9 +71,10 @@ data:
 
       {{- with $config.extraServer }}
       {{- range $key, $val := . }}
-      {{ $key }}: {{ $val }}
+      {{ $key }}: {{ include "unbound.bool" $val }}
       {{- end }}
       {{- end }}
+
 
       {{- range $config.localZones }}
       local-zone: "{{ .name }}" {{ .localType }}
@@ -109,6 +110,6 @@ data:
 
     {{- with $config.extra }}
     {{- range $key, $val := . }}
-    {{ $key }}: {{ $val }}
+    {{ $key }}: {{ include "unbound.bool" $val }}
     {{- end }}
     {{- end }}
