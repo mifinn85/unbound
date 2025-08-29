@@ -61,3 +61,13 @@ policy/v1
 policy/v1beta1
 {{- end }}
 {{- end -}}
+
+{{/*
+Render a value as "yes" or "no" for Unbound config
+*/}}
+{{- define "unbound.bool" -}}
+{{- $val := toString . | lower -}}
+{{- if or (eq $val "true") (eq $val "yes") -}}yes
+{{- else if or (eq $val "false") (eq $val "no") -}}no
+{{- else -}}{{ $val }}{{- end -}}
+{{- end -}}
