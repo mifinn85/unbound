@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ template "unbound.name" . }}
     chart: {{ template "unbound.chart" . }}
-    release: {{ .Release.Name  }}
+    release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
   unbound.conf: |-
@@ -27,7 +27,7 @@ data:
       so-reuseport: yes
       do-daemonize: no
       use-syslog: no
-      statistics-interval: {{ $config.statsInterval | default "0"}}
+      statistics-interval: {{ $config.statsInterval | default "0" }}
       statistics-cumulative: {{ $config.statsCumulative | default "no" }}
 
       auto-trust-anchor-file: "/var/lib/unbound/root.key"
@@ -70,13 +70,15 @@ data:
       local-data-ptr: "127.0.0.1 health.check.unbound"
 
       {{- with $config.extraServer }}
-{{ toYaml . | nindent 6 }}
+      {{- range $key, $val := . }}
+      {{ $key }}: {{ $val }}
       {{- end }}
-
+      {{- end }}
 
       {{- range $config.localZones }}
       local-zone: "{{ .name }}" {{ .localType }}
       {{- end }}
+
     remote-control:
       control-enable: {{ $config.controleEnable | default "yes" }}
       control-interface: {{ $config.controlInterface | default "127.0.0.1" }}
@@ -85,26 +87,28 @@ data:
 
     {{- range $config.forwardZones }}
     forward-zone:
-        name: {{ .name }}
-        {{- range .forwardHosts }}
-        forward-host: {{ . }}
-        {{- end }}
-        {{- range .forwardIps }}
-        forward-addr: {{ . }}
-        {{- end }}
+      name: {{ .name }}
+      {{- range .forwardHosts }}
+      forward-host: {{ . }}
+      {{- end }}
+      {{- range .forwardIps }}
+      forward-addr: {{ . }}
+      {{- end }}
     {{- end }}
 
     {{- range $config.stubZones }}
     stub-zone:
-        name: {{ .name }}
-        {{- range .stubHosts }}
-        stub-host: {{ . }}
-        {{- end }}
-        {{- range .stubIps }}
-        stub-addr: {{ . }}
-        {{- end }}
+      name: {{ .name }}
+      {{- range .stubHosts }}
+      stub-host: {{ . }}
+      {{- end }}
+      {{- range .stubIps }}
+      stub-addr: {{ . }}
+      {{- end }}
     {{- end }}
 
     {{- with $config.extra }}
-{{ toYaml . | nindent 4 }}
+    {{- range $key, $val := . }}
+    {{ $key }}: {{ $val }}
+    {{- end }}
     {{- end }}
